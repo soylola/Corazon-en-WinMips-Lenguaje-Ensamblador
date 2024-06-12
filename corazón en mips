@@ -1,0 +1,63 @@
+.data
+CONTROL: .word 0x10000
+DATA: .word 0x10008
+color: .byte 255, 0, 0, 0
+coorX: .byte 15
+coorY: .byte 10
+lineas: .byte 3, 5, 7, 8, 9, 9, 9, 9, 9, 8, 7, 5, 3
+
+.text
+lwu $s6, CONTROL($0)
+lwu $s7, DATA($0)
+lwu $s2, color($0)
+sw $s2, 0($s7)
+daddi $t1, $0, 7
+daddi $t2, $0, 0
+daddi $t0, $0, 5
+lb $s0, coorY($0)
+lb $s1, coorX($0)
+
+lazo1: lb $t3, lineas($t2) ; traer el primer valor a iterar
+       
+       lazo2: sb $s1, 5($s7)
+              sb $s0, 4($s7)
+              
+              sb $t0, 0($s6) ;mandar a CONTROL el código 5 para que imprima 1 pixel
+              daddi $t3, $t3, -1
+              daddi $s0, $s0, 1 ;sumar 1 a coorY
+              bnez $t3, lazo2
+
+       lb $t3, lineas($t2)
+       dsub $s0, $s0, $t3 
+       daddi $s0, $s0, -1 ;restar 1 a coorY
+       daddi $s1, $s1, 1 ;sumar 1 a coorX
+       daddi $t2, $t2, 1 ;sumo 1 a despl. de lineas
+
+       daddi $t1, $t1, -1 ;restar 1 a cant. elementos
+       bnez $t1, lazo1
+
+
+lb $s0, coorY($0)
+daddi $s0, $s0, -5
+daddi $t1, $0, 6
+
+lazo3:  lb $t3, lineas($t2)
+        lazo4: sb $s1, 5($s7)
+              sb $s0, 4($s7)
+
+              sb $t0, 0($s6) ; pinto pixel
+
+              daddi $t3, $t3, -1
+              daddi $s0, $s0, 1 
+              bnez $t3, lazo4
+        
+        lb $t3, lineas($t2)
+        dsub $s0, $s0, $t3 ; vuelvo abajo
+        daddi $s0, $s0, 1 ;sumo 1 a coorY
+        daddi $s1, $s1, 1 ;sumar 1 a coorX
+
+        daddi $t2, $t2, 1 
+        daddi $t1, $t1, -1 
+        bnez $t1, lazo3
+
+halt
